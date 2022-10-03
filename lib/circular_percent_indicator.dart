@@ -25,6 +25,7 @@ num radians(num deg) => deg * (math.pi / 180.0);
 // ignore: must_be_immutable
 class CircularPercentIndicator extends StatefulWidget {
   ///Percent value between 0.0 and 1.0
+  final double prevPercent;
   final double percent;
   final double radius;
 
@@ -103,6 +104,7 @@ class CircularPercentIndicator extends StatefulWidget {
 
   CircularPercentIndicator({
     Key? key,
+    this.prevPercent = 0.0,
     this.percent = 0.0,
     this.lineWidth = 5.0,
     this.startAngle = 0.0,
@@ -175,16 +177,17 @@ class _CircularPercentIndicatorState extends State<CircularPercentIndicator>
         vsync: this,
         duration: Duration(milliseconds: widget.animationDuration),
       );
-      _animation = Tween(begin: 0.0, end: widget.percent).animate(
+      _animation =
+          Tween(begin: widget.prevPercent, end: widget.percent).animate(
         CurvedAnimation(parent: _animationController!, curve: widget.curve),
       )..addListener(() {
-          setState(() {
-            _percent = _animation!.value;
-          });
-          if (widget.restartAnimation && _percent == 1.0) {
-            _animationController!.repeat(min: 0, max: 1.0);
-          }
-        });
+              setState(() {
+                _percent = _animation!.value;
+              });
+              if (widget.restartAnimation && _percent == 1.0) {
+                _animationController!.repeat(min: 0, max: 1.0);
+              }
+            });
       _animationController!.addStatusListener((status) {
         if (widget.onAnimationEnd != null &&
             status == AnimationStatus.completed) {
